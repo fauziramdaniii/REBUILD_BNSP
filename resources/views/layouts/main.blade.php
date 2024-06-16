@@ -48,7 +48,7 @@
                                     class="navi navi-hover navi-active navi-accent navi-link-rounded font-weight-bold pb-10">
                                     <li class="navi-item py-1">
                                         <a class="navi-link py-4 {{ Request::is('home*') ? 'active' : '' }}"
-                                            href="#" id="tabHome">
+                                            href="/home" id="tabHome">
                                             <span class="navi-icon mr-2">
                                                 <span class="svg-icon svg-icon-2x">
                                                     <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo1/dist/../src/media/svg/icons/Home/Home.svg--><svg
@@ -75,7 +75,7 @@
                                     </li>
                                     <li class="navi-item py-1">
                                         <a class="navi-link py-4 {{ Request::is('tag*') ? 'active' : '' }}"
-                                            href="#" id="tabTag">
+                                            href="/tag">
                                             <span class="navi-icon mr-2">
                                                 <span class="svg-icon svg-icon-2x">
                                                     <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo1/dist/../src/media/svg/icons/General/Search.svg--><svg
@@ -102,7 +102,7 @@
                                     </li>
                                     <li class="navi-item py-1">
                                         <a class="navi-link py-4 {{ Request::is('profile') ? 'active' : '' }}"
-                                            href="#" id="tabProfile">
+                                            href="/profile">
                                             <span class="navi-icon mr-2">
                                                 <span class="svg-icon svg-icon-md">
                                                     <!--begin::Svg Icon | path:/keen/theme/demo1/dist/assets/media/svg/icons/Communication/Adress-book2.svg-->
@@ -154,7 +154,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-8" id="content-container">
+            <div class="col-lg-8">
                 @yield('content')
             </div>
         </div>
@@ -187,18 +187,21 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
+        // Load initial content
+        loadContent('/home');
+
         // Handle tab clicks
-        $('#tabHome').on('click', function(e) {
+        $('#home').on('click', function(e) {
             e.preventDefault();
             loadContent('/home');
         });
 
-        $('#tabTag').on('click', function(e) {
+        $('#tag').on('click', function(e) {
             e.preventDefault();
             loadContent('/tag');
         });
 
-        $('#tabProfile').on('click', function(e) {
+        $('#profile').on('click', function(e) {
             e.preventDefault();
             loadContent('/profile');
         });
