@@ -1,26 +1,27 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
 
-Route::get('/users', [UserController::class, 'index']);
-Route::get('/users/{id}', [UserController::class, 'show']);
-Route::post('/users', [UserController::class, 'store']);
-Route::put('/users/{id}', [UserController::class, 'update']);
-Route::delete('/users/{id}', [UserController::class, 'destroy']);
-
-
-Route::get('/login', function () {
-    return view('auth.login');
+// Redirect root to home
+Route::get('/', function () {
+return redirect()->intended('/home');
 });
 
-Route::get('/logout', function () {
-    return view('auth.login');
-});
+// Auth routes
+Route::get('login', [AuthController::class, 'index'])->name('login');
+Route::post('post-login', [AuthController::class, 'postLogin'])->name('login.post');
+Route::get('registration', [AuthController::class, 'registration'])->name('register');
+Route::post('post-registration', [AuthController::class, 'postRegistration'])->name('register.post');
+Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/home',[HomeController::class, 'index'])->name('home');
-Route::get('/tag',[TagController::class,'index'])->name('tag');
-Route::get('/profile',[ProfileController::class, 'index'])->name('profile');
+// Protected routes
+Route::middleware('auth')->group(function () {
+Route::get('home', [HomeController::class, 'index'])->name('home');
+Route::get('/tag', [TagController::class, 'index'])->name('tag');
+Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+});

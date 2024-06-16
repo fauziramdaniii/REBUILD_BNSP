@@ -46,4 +46,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function ProfileModel(){
+        return $this->hasOne(User::class,'id');
+    }
+
+    public static function getPicture($id){
+        $user = User::with('ProfileModel')->where('id',$id)->first();
+        $file = $user->ProfileModel->profile_picture != null ? "/uploads/img/".$user->ProfileModel->profile_picture : "";
+        // dd($file);
+        return $file;
+    }
+
 }

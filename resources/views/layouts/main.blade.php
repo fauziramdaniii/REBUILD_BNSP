@@ -48,7 +48,7 @@
                                     class="navi navi-hover navi-active navi-accent navi-link-rounded font-weight-bold pb-10">
                                     <li class="navi-item py-1">
                                         <a class="navi-link py-4 {{ Request::is('home*') ? 'active' : '' }}"
-                                            href="/home" id="tabHome">
+                                            href="/home" id="home">
                                             <span class="navi-icon mr-2">
                                                 <span class="svg-icon svg-icon-2x">
                                                     <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-04-21-040700/theme/demo1/dist/../src/media/svg/icons/Home/Home.svg--><svg
@@ -130,20 +130,25 @@
                                         <button type="button" class="btn btn-primary btn-lg btn-block  mt-5">POST
                                         </button>
                                     </div>
-                                    <form action="/logout" class="mt-10" method="post" id="form-logout">
-                                        <div
+
+
+                                    <form action="{{ route('logout') }}" method="POST" class="mt-10"
+                                        id="form-logout">
+                                        @csrf
+                                        <button type="submit"
                                             class="btn btn-light-success d-inline-flex align-items-center btn-lg mr-5">
                                             <div class="d-flex flex-column text-right pr-3">
-                                                <span class="text-dark-75 font-weight-bold font-size-sm">Fauzi
-                                                    Ramdani</span>
+                                                <span
+                                                    class="text-dark-75 font-weight-bold font-size-sm">{{ Auth()->user()->username ?? 'guest' }}</span>
                                                 <span class="font-weight-bolder font-size-sm">Logout</span>
                                             </div>
                                             <span class="symbol symbol-40">
                                                 <img alt="Pic"
                                                     src="../../../theme/demo1/dist/assets/media/users/150-1.jpg" />
                                             </span>
-                                        </div>
+                                        </button>
                                     </form>
+
                                 </ul>
                                 <!--end::Nav-->
                             </div>
@@ -154,7 +159,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-8">
+            <div class="col-lg-8" id="content-container">
                 @yield('content')
             </div>
         </div>
@@ -183,44 +188,7 @@
 <script src="../../../theme/demo1/dist/assets/js/scripts.bundle1036.js?v=2.1.1"></script>
 <script src="../../../theme/demo1/dist/assets/js/pages/widgets1036.js?v=2.1.1"></script>
 <script src="../../..//theme/demo1/dist/assets/js/pages/custom/profile/profile1036.js?v=2.1.1"></script>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        // Load initial content
-        loadContent('/home');
-
-        // Handle tab clicks
-        $('#home').on('click', function(e) {
-            e.preventDefault();
-            loadContent('/home');
-        });
-
-        $('#tag').on('click', function(e) {
-            e.preventDefault();
-            loadContent('/tag');
-        });
-
-        $('#profile').on('click', function(e) {
-            e.preventDefault();
-            loadContent('/profile');
-        });
-
-        // Function to load content
-        function loadContent(url) {
-            $.ajax({
-                url: url,
-                method: 'GET',
-                success: function(response) {
-                    $('#content-container').html(response);
-                },
-                error: function(xhr) {
-                    console.error(xhr.responseText);
-                }
-            });
-        }
-    });
-</script>
 
 @yield('js')
 
