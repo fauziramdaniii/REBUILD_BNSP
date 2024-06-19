@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\PostImage;
+use App\Models\Hashtag;
+use App\Models\PostHashtag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -11,13 +13,13 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('images')->get();
+        $posts = Post::with(['images', 'hashtags'])->get();
         return response()->json($posts);
     }
 
     public function show($id)
     {
-        $post = Post::with('images')->find($id);
+        $post = Post::with(['images', 'hashtags'])->find($id);
         if ($post) {
             return response()->json($post);
         } else {
@@ -42,6 +44,7 @@ class PostController extends Controller
         $post->content = $request->content;
         $post->save();
 
+        // Handle images
         if ($request->has('images')) {
             foreach ($request->images as $image_path) {
                 $filename = basename($image_path);
@@ -60,7 +63,10 @@ class PostController extends Controller
             }
         }
 
-        return response()->json($post->load('images'), 201);
+        // Handle hashtags
+        $this->handleHashtags($post, $request->content);
+
+        return response()->json($post->load(['images', 'hashtags']), 201);
     }
 
     public function update(Request $request, $id)
@@ -70,6 +76,7 @@ class PostController extends Controller
             $post->content = $request->content ?? $post->content;
             $post->save();
 
+            // Handle images
             if ($request->has('images')) {
                 // Delete existing images
                 $post->images()->delete();
@@ -92,7 +99,10 @@ class PostController extends Controller
                 }
             }
 
-            return response()->json($post->load('images'));
+            // Handle hashtags
+            $this->handleHashtags($post, $request->content);
+
+            return response()->json($post->load(['images', 'hashtags']));
         } else {
             return response()->json(['message' => 'Post not found'], 404);
         }
@@ -116,5 +126,21 @@ class PostController extends Controller
         } else {
             return response()->json(['message' => 'Post not found'], 404);
         }
+    }
+
+    private function handleHashtags(Post $post, $content)
+    {
+        // Extract hashtags from the content
+        preg_match_all('/#(\w+)/', $content, $matches);
+        $hashtags = $matches[1];
+
+        // Sync hashtags with the post
+        $hashtagIds = [];
+        foreach ($hashtags as $hashtag) {
+            $hashtagModel = Hashtag::firstOrCreate(['name' => $hashtag]);
+            $hashtagIds[] = $hashtagModel->id;
+        }
+
+        $post->hashtags()->sync($hashtagIds);
     }
 }

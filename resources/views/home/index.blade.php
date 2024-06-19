@@ -32,7 +32,7 @@
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="kt_tab_pane_1_4" role="tabpanel"
                         aria-labelledby="kt_tab_pane_1_4">
-                        <div class="card card-custom bg-success">
+                        <div class="card card-custom bg-success mb-6">
                             <div class="card-header border-0">
                                 <div class="card-title">
                                     <span class="symbol symbol-40 mr-3">
@@ -55,7 +55,8 @@
                                             <div class="card">
                                                 <div class="card-body p-0">
                                                     <img src="{{ $image->image_url }}" alt="Post Image" class="img-fluid"
-                                                        style="width: 100%; height: 150px; object-fit: cover;">
+                                                        style="width: 100%; height: 150px; object-fit: cover;"
+                                                        onclick="showImageModal('{{ $image->image_url }}')">
                                                 </div>
                                             </div>
                                         </div>
@@ -74,4 +75,33 @@
             Asomasow
         </div> --}}
     </div>
+
+    <!-- Modal for image preview -->
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="imageModalSrc" src="" alt="Large Image" class="img-fluid"
+                        style="height: 400px; width: 300px">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+        function showImageModal(src) {
+            document.getElementById('imageModalSrc').src = src;
+            $('#imageModal').modal('show');
+        }
+    </script>
 @endsection

@@ -260,7 +260,6 @@
 <script src="{{ asset('../../../theme/demo1/dist/assets/js/pages/custom/profile/profile1036.js?v=2.1.1') }}"></script>
 <script src="{{ asset('../../../theme/demo1/dist/assets/js/pages/features/file-upload/dropzonejs1036.js?v=2.1.1') }}">
 </script>
-
 <script>
     $('#exampleModalScrollable').on('shown.bs.modal', function() {
         // Code to refresh or reapply the image background
@@ -308,35 +307,53 @@
         const content = document.getElementById('content').value;
         const userId = "{{ Auth::user()->id }}"; // Assuming the user is logged in and their ID is available
 
+        // Debugging logs
+        console.log('User ID:', userId);
+        console.log('Content:', content);
+        console.log('Uploaded Images:', uploadedImages);
+
+        // Create a FormData object
+        let formData = new FormData();
+        formData.append('user_id', userId);
+        formData.append('content', content);
+        formData.append('_token', "{{ csrf_token() }}");
+
+        // Append images to the formData
+        for (let i = 0; i < uploadedImages.length; i++) {
+            formData.append('images[]', uploadedImages[i]);
+        }
+
         $.ajax({
             url: '/posts',
             type: 'POST',
-            data: {
-                user_id: userId,
-                content: content,
-                images: uploadedImages,
-                _token: "{{ csrf_token() }}"
-            },
+            data: formData,
+            processData: false, // Prevent jQuery from processing the data
+            contentType: false, // Prevent jQuery from setting content type
             success: function(response) {
                 // Handle success
                 alert('Post created successfully!');
 
+                // Clear the form fields
                 document.getElementById('content').value = '';
 
+                // Clear Dropzone files
                 myDropzone.removeAllFiles(true);
 
+                // Clear the uploadedImages array
                 uploadedImages = [];
+
+                // Hide the modal
                 $('#exampleModalScrollable').modal('hide');
+
                 // Optionally, refresh the page or update the post list dynamically
             },
             error: function(response) {
                 // Handle error
                 alert('Failed to create post.');
+                console.log(response); // Log the response for debugging
             }
         });
     }
 </script>
-
-@yield('js')
 
 </html>
