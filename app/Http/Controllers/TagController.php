@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class TagController extends Controller
 {
@@ -12,11 +14,8 @@ class TagController extends Controller
      */
     public function index()
     {
-        if(request()->ajax()){
-            return view('tag.index');
-        }
-
-        return view('tag.index');
+        $user = Auth::user();
+        return view('tag.index', compact('user'));
     }
 
     /**

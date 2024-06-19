@@ -5,6 +5,7 @@
 <head>
 
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>Social Media</title>
     <meta name="description" content="No aside layout examples" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -23,7 +24,24 @@
     <link href="../../../theme/demo1/dist/assets/css/themes/layout/brand/light.css" rel="stylesheet" type="text/css" />
     <link href="../../../theme/demo1/dist/assets/css/themes/layout/aside/dark.css" rel="stylesheet" type="text/css" />
     <!--end::Layout Themes-->
+    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/dropzone.min.css"> --}}
 </head>
+
+<style>
+    /* .modal-dialog {
+        max-width: 90%;
+    } */
+
+    .modal-header {
+        border: none;
+    }
+
+    .modal-title-filter {
+        color: #2D2D2D;
+        font-size: 1.2em;
+        text-align: center;
+    }
+</style>
 
 <body id="kt_body"
     class="quick-panel-right demo-panel-right offcanvas-right header-fixed header-mobile-fixed subheader-enabled page-loading">
@@ -127,7 +145,8 @@
                                         </a>
                                     </li>
                                     <div class="card-toolbar">
-                                        <button type="button" class="btn btn-primary btn-lg btn-block  mt-5">POST
+                                        <button type="button" class="btn btn-primary btn-lg btn-block mt-5"
+                                            data-toggle="modal" data-target="#exampleModalScrollable">POST
                                         </button>
                                     </div>
 
@@ -143,8 +162,7 @@
                                                 <span class="font-weight-bolder font-size-sm">Logout</span>
                                             </div>
                                             <span class="symbol symbol-40">
-                                                <img alt="Pic"
-                                                    src="../../../theme/demo1/dist/assets/media/users/150-1.jpg" />
+                                                <img alt="Pic" src="<?php echo \App\Models\User::getPicture(auth()->user()->id); ?>" />
                                             </span>
                                         </button>
                                     </form>
@@ -182,13 +200,142 @@
                 <!--end::Svg Icon-->
             </span>
         </div>
+
+
+        <!-- Button trigger modal-->
+
+        <!-- Modal-->
+        <div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog"
+            aria-labelledby="staticBackdrop" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="symbol symbol-40">
+                            <img alt="Pic"
+                                src="{{ $user->profile_picture ? asset('uploads/img/' . $user->profile_picture) : asset('img/blank.png') }}" />
+                        </span>
+                        <h5 class="modal-title modal-title-filter" id="exampleModalLabel">
+                            {{ Auth::user()->username }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="postForm" class="dropzone" action="/posts" method="post">
+                            @csrf
+                            <div class="mb-3">
+                                <textarea class="form-control" id="content" name="content" rows="3" placeholder="What's on your mind?"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-group row">
+                                    <div class="col-lg-12">
+                                        <div class="dropzone dropzone-default dropzone-primary" id="kt_dropzone_2">
+                                            <div class="dropzone-msg dz-message needsclick">
+                                                <h3 class="dropzone-msg-title">Drop Images Here or Click to Upload.
+                                                </h3>
+                                                <span class="dropzone-msg-desc">Upload up to 10 files</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-primary font-weight-bold"
+                            data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary font-weight-bold"
+                            onclick="submitPostForm()">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 </body>
 
-<script src="../../../theme/demo1/dist/assets/plugins/global/plugins.bundle1036.js?v=2.1.1"></script>
-<script src="../../../theme/demo1/dist/assets/js/scripts.bundle1036.js?v=2.1.1"></script>
-<script src="../../../theme/demo1/dist/assets/js/pages/widgets1036.js?v=2.1.1"></script>
-<script src="../../..//theme/demo1/dist/assets/js/pages/custom/profile/profile1036.js?v=2.1.1"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ asset('../../../theme/demo1/dist/assets/plugins/global/plugins.bundle1036.js?v=2.1.1') }}"></script>
+<script src="{{ asset('../../../theme/demo1/dist/assets/js/scripts.bundle1036.js?v=2.1.1') }}"></script>
+<script src="{{ asset('../../../theme/demo1/dist/assets/js/pages/widgets1036.js?v=2.1.1') }}"></script>
+<script src="{{ asset('../../../theme/demo1/dist/assets/js/pages/custom/profile/profile1036.js?v=2.1.1') }}"></script>
+<script src="{{ asset('../../../theme/demo1/dist/assets/js/pages/features/file-upload/dropzonejs1036.js?v=2.1.1') }}">
+</script>
+
+<script>
+    $('#exampleModalScrollable').on('shown.bs.modal', function() {
+        // Code to refresh or reapply the image background
+        $('.image-input-wrapper').css('background-image', function() {
+            return 'url(' + ($(this).data('image-url') || '{{ asset('img/blank.png') }}') + ')';
+        });
+    });
+
+    Dropzone.autoDiscover = false;
+    let uploadedImages = [];
+
+    const myDropzone = new Dropzone("#kt_dropzone_2", {
+        url: '/upload_temp', // Temporary endpoint for uploading images
+        paramName: 'file',
+        maxFiles: 10,
+        maxFilesize: 2, // MB
+        acceptedFiles: 'image/*',
+        addRemoveLinks: true,
+        headers: {
+            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+        },
+        success: function(file, response) {
+            uploadedImages.push(response.filepath); // Store the uploaded file paths
+        },
+        removedfile: function(file) {
+            let response;
+            if (file.xhr && file.xhr.response) {
+                response = JSON.parse(file.xhr.response);
+            }
+
+            if (response && response.filepath) {
+                let index = uploadedImages.indexOf(response.filepath);
+                if (index > -1) {
+                    uploadedImages.splice(index, 1);
+                }
+            }
+
+            let _ref;
+            return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) :
+                void 0;
+        }
+    });
+
+    function submitPostForm() {
+        const content = document.getElementById('content').value;
+        const userId = "{{ Auth::user()->id }}"; // Assuming the user is logged in and their ID is available
+
+        $.ajax({
+            url: '/posts',
+            type: 'POST',
+            data: {
+                user_id: userId,
+                content: content,
+                images: uploadedImages,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                // Handle success
+                alert('Post created successfully!');
+
+                document.getElementById('content').value = '';
+
+                myDropzone.removeAllFiles(true);
+
+                uploadedImages = [];
+                $('#exampleModalScrollable').modal('hide');
+                // Optionally, refresh the page or update the post list dynamically
+            },
+            error: function(response) {
+                // Handle error
+                alert('Failed to create post.');
+            }
+        });
+    }
+</script>
 
 @yield('js')
 

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Home;
+use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -12,57 +13,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        if (request()->ajax()) {
-            return view('home.index'); // Partial view untuk konten home
-        }
-        return view('home.index'); // View utama
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Home $home)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Home $home)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Home $home)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Home $home)
-    {
-        //
+        $user = Auth::user();
+        $posts = Post::with('images', 'user')->get(); // Mengambil semua data Post beserta relasi images dan user
+        return view('home.index', compact('user', 'posts'));
     }
 }

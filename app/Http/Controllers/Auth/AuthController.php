@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Validator;
   
 class AuthController extends Controller
 {
@@ -61,12 +62,16 @@ class AuthController extends Controller
      */
     public function postRegistration(Request $request): RedirectResponse
     {  
-        $request->validate([
-            'username' => 'required|unique:users,username',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
         ]);
-           
+    
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        
         $data = $request->all();
         $user = $this->create($data);
             

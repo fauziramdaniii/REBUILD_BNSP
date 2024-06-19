@@ -29,7 +29,7 @@
                                 </a>
                             </div>
                             <h2 class="fs-6 fw-normal text-center text-secondary mb-4">Sign up to your account</h2>
-                            <form method="POST" action="{{ route('register.post') }}">
+                            <form method="POST" action="{{ route('register.post') }}" id="registerForm">
                                 @csrf
 
                                 @session('error')
@@ -114,6 +114,19 @@
         </div>
     </section>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#registerForm').submit(function(e) {
+                var password = $('#password').val();
+                var confirmPassword = $('#password_confirmation').val();
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Passwords do not match.');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
